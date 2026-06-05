@@ -1,36 +1,91 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# EssaiAI - Frontend
 
-## Getting Started
+## Table of Contents
+1. [Project Overview](#project-overview)
+2. [Tech Stack](#tech-stack)
+3. [Architecture Overview](#architecture-overview)
+4. [Folder Structure](#folder-structure)
+5. [Getting Started](#getting-started)
+6. [Environment Variables](#environment-variables)
+7. [Running the Project](#running-the-project)
+8. [Backend Integration](#backend-integration)
+9. [Deployment](#deployment)
+10. [Contributing](#contributing)
+11. [License](#license)
 
-First, run the development server:
+## Project Overview
+EssaiAI is a stateless, privacy-first academic writing assistant. The frontend provides a sleek, modern, and highly responsive user interface for analyzing grammar, style, and structural alignment instantly. It features a rich text editor and dynamically handles specific document types (like formal letters, theses, and blog posts). To guarantee maximum privacy, absolutely zero data is stored persistently on any server; all drafts and user preferences are safely stored within your browser's `localStorage`.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Tech Stack
+- **Framework:** Next.js (App Router)
+- **Library:** React
+- **Styling:** Tailwind CSS v4
+- **Editor:** TipTap (Rich Text Editor)
+- **Icons:** Lucide React
+- **Typography:** Plus Jakarta Sans & Lora (Google Fonts)
+
+## Architecture Overview
+The frontend strictly handles presentation, state management, and user configurations. 
+When an analysis is requested, the Next.js client securely packages the document text, grading criteria, and any user-provided LLM API keys. It then sends this payload directly to the stateless NestJS backend API. The frontend then streams or awaits the structured JSON response, rendering the "Notable Strengths", "Key Suggestions", and individual "Section Evaluations" into a beautiful, readable UI.
+
+## Folder Structure
+```text
+frontend/
+├── public/                # Static assets
+├── src/
+│   └── app/
+│       ├── components/    # Reusable UI components (Sidebar, AnalysisPage, DraftsPage)
+│       ├── globals.css    # Tailwind v4 configuration and global styles
+│       ├── layout.tsx     # Root Next.js layout and typography setup
+│       └── page.tsx       # Main workspace state and routing
+├── .env.example           # Example environment variables
+├── package.json           # Frontend dependencies
+└── README.md              # This documentation
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Getting Started
+### Prerequisites
+- Node.js (v18.x or v20.x recommended)
+- npm
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Installation
+Clone the repository and install dependencies:
+```bash
+git clone https://github.com/your-username/essai-ai-frontend.git
+cd essai-ai-frontend
+npm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Environment Variables
+The frontend relies on environment variables to know where to send analysis requests. Copy the `.env.example` file to create your own local configuration:
+```bash
+cp .env.example .env.local
+```
+Inside `.env.local`, set your backend API URL:
+```env
+NEXT_PUBLIC_API_BASE_URL=http://localhost:3001
+```
 
-## Learn More
+## Running the Project
+Start the Next.js development server:
+```bash
+npm run dev
+```
+The application will be available at [http://localhost:3000](http://localhost:3000).
 
-To learn more about Next.js, take a look at the following resources:
+## Backend Integration
+This frontend is designed to work in tandem with the **EssaiAI Backend**. The backend is a stateless NestJS API that proxies requests to LLM providers. Ensure the backend is running locally on port 3001 for full end-to-end functionality.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Deployment
+This project is optimized for deployment on the [Vercel Platform](https://vercel.com) from the creators of Next.js.
+When deploying, make sure to add the `NEXT_PUBLIC_API_BASE_URL` to your Vercel project's Environment Variables, pointing to your live backend domain.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Contributing
+1. Fork the project.
+2. Create your feature branch (`git checkout -b feature/amazing-ui`).
+3. Commit your changes (`git commit -m 'Add some amazing UI'`).
+4. Push to the branch (`git push origin feature/amazing-ui`).
+5. Open a Pull Request.
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## License
+Distributed under the MIT License.
