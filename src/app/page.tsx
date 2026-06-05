@@ -209,9 +209,9 @@ export default function Home() {
         'Content-Type': 'application/json',
       };
 
-      if (geminiKey) headers['x-gemini-key'] = geminiKey;
-      if (openaiKey) headers['x-openai-key'] = openaiKey;
-      if (anthropicKey) headers['x-anthropic-key'] = anthropicKey;
+      if (geminiKey) headers['x-gemini-key'] = geminiKey.trim();
+      if (openaiKey) headers['x-openai-key'] = openaiKey.trim();
+      if (anthropicKey) headers['x-anthropic-key'] = anthropicKey.trim();
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/review`, {
         method: 'POST',
