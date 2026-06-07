@@ -12,44 +12,53 @@ import {
   List as ListIcon,
   ChevronDown,
   ChevronUp,
-  Save
+  Save,
+  UploadCloud
 } from 'lucide-react';
 import { ReviewResult } from './data/templates';
 
 interface AnalysisPageProps {
   editor: Editor | null;
   charCount: number;
-  gradingMode: 'general_essay' | 'formal_letter' | 'thesis' | 'blog_post' | string;
-  setGradingMode: (mode: any) => void;
   selectedModel: 'gemini' | 'openai' | 'anthropic';
   setSelectedModel: (model: 'gemini' | 'openai' | 'anthropic') => void;
   reviewResult: ReviewResult | null;
   isLoading: boolean;
+  isDetecting: boolean;
+  isUploading: boolean;
   loadingProgress: number;
   hasAnalyzed: boolean;
   errorMsg: string | null;
-  handleReview: () => void;
+  handleAnalyzeClick: () => void;
   handleSaveDraft: () => void;
+  handleFileUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   mobileTab: 'editor' | 'analysis';
   setMobileTab: (tab: 'editor' | 'analysis') => void;
+  geminiKey: string;
+  openaiKey: string;
+  anthropicKey: string;
 }
 
 export default function AnalysisPage({
   editor,
   charCount,
-  gradingMode,
-  setGradingMode,
   selectedModel,
   setSelectedModel,
   reviewResult,
   isLoading,
+  isDetecting,
+  isUploading,
   loadingProgress,
   hasAnalyzed,
   errorMsg,
-  handleReview,
+  handleAnalyzeClick,
   handleSaveDraft,
+  handleFileUpload,
   mobileTab,
-  setMobileTab
+  setMobileTab,
+  geminiKey,
+  openaiKey,
+  anthropicKey
 }: AnalysisPageProps) {
   
   // Array of loading messages to rotate through
@@ -108,19 +117,30 @@ export default function AnalysisPage({
                 </h3>
               </div>
 
-              {/* Document Type Selector dropdown */}
-              <div className="flex items-center gap-1.5 sm:ml-4 sm:border-l border-gray-200 sm:pl-4">
-                <select
-                  value={gradingMode}
-                  onChange={(e) => setGradingMode(e.target.value)}
-                  className="text-xs font-semibold bg-white border border-[#e2e8f0] text-gray-600 rounded px-2.5 py-1 focus:outline-none focus:border-indigo-500 cursor-pointer w-full sm:w-auto"
-                >
-                  <option value="general_essay">General Essay</option>
-                  <option value="formal_letter">Formal Letter</option>
-                  <option value="thesis">Thesis / Chapter</option>
-                  <option value="blog_post">Blog Post / Article</option>
-                </select>
+              {/* Upload Document Button */}
+              <div className="flex items-center sm:ml-4 sm:border-l border-gray-200 sm:pl-4">
+                <label className={`flex items-center gap-2 px-3 py-1.5 text-xs font-bold rounded-lg cursor-pointer transition-colors ${
+                  isUploading 
+                    ? 'bg-indigo-100 text-indigo-400 cursor-not-allowed' 
+                    : 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100 hover:text-indigo-700'
+                }`}>
+                  {isUploading ? (
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <UploadCloud className="h-4 w-4" />
+                  )}
+                  {isUploading ? 'Uploading...' : 'Upload Doc'}
+                  <input 
+                    type="file" 
+                    accept=".pdf,.docx" 
+                    onChange={handleFileUpload}
+                    disabled={isUploading}
+                    className="hidden" 
+                  />
+                </label>
               </div>
+
+              {/* Removed manual Document Type Selector for V2 Detection */}
             </div>
 
             {/* Text editor format toolbars */}
@@ -194,14 +214,19 @@ export default function AnalysisPage({
                 <span className="hidden sm:inline">Save Draft</span>
               </button>
               <button
-                onClick={handleReview}
-                disabled={isLoading || charCount < 100}
+                onClick={handleAnalyzeClick}
+                disabled={isLoading || isDetecting || charCount < 100}
                 className="flex-1 sm:flex-none px-6 py-3 bg-[#0f172a] hover:bg-[#1e293b] disabled:bg-gray-200 disabled:text-gray-400 text-white rounded-lg font-bold text-sm tracking-wide transition uppercase flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
               >
                 {isLoading ? (
                   <>
                     <RefreshCw className="h-4 w-4 animate-spin" />
                     <span className="hidden sm:inline">Evaluating...</span>
+                  </>
+                ) : isDetecting ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                    <span className="hidden sm:inline">Scanning...</span>
                   </>
                 ) : (
                   <>
@@ -293,7 +318,7 @@ export default function AnalysisPage({
                   <div>
                     <h4 className="text-xl font-black text-[#0f172a] mb-1">Overall Assessment</h4>
                     <p className="text-sm text-gray-500 leading-relaxed">
-                      Tailored specifically for <strong>{gradingMode.replace('_', ' ')}</strong> formatting.
+                      Tailored specifically for the detected document type formatting.
                     </p>
                   </div>
                   {/* Overall Score Box */}

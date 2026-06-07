@@ -10,6 +10,7 @@ import AnalysisPage from './components/AnalysisPage';
 import ReviewersPage from './components/ReviewersPage';
 import SettingsModal from './components/SettingsModal';
 import DraftsPage, { Draft } from './components/DraftsPage';
+import DetectionModal from './components/DetectionModal';
 
 export default function Home() {
   // Navigation tabs: 'home' | 'templates' | 'reviewers' | 'drafts'
@@ -23,7 +24,6 @@ export default function Home() {
 
   // UI state
   const [selectedModel, setSelectedModel] = useState<'gemini' | 'openai' | 'anthropic'>('gemini');
-  const [gradingMode, setGradingMode] = useState<'general_essay' | 'formal_letter' | 'thesis' | 'blog_post'>('general_essay');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
@@ -31,6 +31,10 @@ export default function Home() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [reviewResult, setReviewResult] = useState<ReviewResult | null>(null);
   const [mobileTab, setMobileTab] = useState<'editor' | 'analysis'>('editor');
+
+  // Detection state
+  const [isDetecting, setIsDetecting] = useState(false);
+  const [detectionResult, setDetectionResult] = useState<{ primaryGuess: string, alternatives: string[] } | null>(null);
 
   // Drafts state
   const [drafts, setDrafts] = useState<Draft[]>([]);
@@ -94,7 +98,6 @@ export default function Home() {
     setCharCount(0);
     setHasAnalyzed(false);
     setLoadingProgress(0);
-    setGradingMode('general_essay');
     setMobileTab('editor');
   };
 
@@ -113,8 +116,7 @@ export default function Home() {
       id: Date.now().toString(),
       title,
       date: new Date().toISOString(),
-      text,
-      gradingMode
+      text
     };
 
     const updatedDrafts = [newDraft, ...drafts];
@@ -134,7 +136,6 @@ export default function Home() {
     setHasAnalyzed(false);
     setErrorMsg(null);
     setActiveNav('home');
-    setGradingMode(draft.gradingMode as any);
     setMobileTab('editor');
   };
 
@@ -157,12 +158,43 @@ export default function Home() {
     setMobileTab('analysis'); // automatically switch to analysis tab on mobile
     const plainText = template.essayText.replace(/<\/?[^>]+(>|$)/g, "");
     setCharCount(plainText.length);
-
-    setGradingMode(template.documentType as any);
   };
 
-  // Send request to real backend API
-  const handleReview = async () => {
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !editor) return;
+
+    setIsUploading(true);
+    setErrorMsg(null);
+    const formData = new FormData();
+    formData.append('document', file);
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/upload`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to upload document.');
+      }
+
+      editor.commands.setContent(data.extractedText);
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Error parsing document.');
+    } finally {
+      setIsUploading(false);
+      // reset file input
+      e.target.value = '';
+    }
+  };
+
+  // Step 1: Trigger background detection
+  const handleAnalyzeClick = async () => {
     if (!editor) return;
     setErrorMsg(null);
     setReviewResult(null);
@@ -189,26 +221,63 @@ export default function Home() {
       return;
     }
 
+    setIsDetecting(true);
+    setMobileTab('analysis');
+
+    try {
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (geminiKey) headers['x-gemini-key'] = geminiKey.trim();
+      if (openaiKey) headers['x-openai-key'] = openaiKey.trim();
+      if (anthropicKey) headers['x-anthropic-key'] = anthropicKey.trim();
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/detect-type`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          essayText: text,
+          targetModel: selectedModel,
+        }),
+      });
+
+      const data = await response.json();
+      setIsDetecting(false);
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to detect document type.');
+      }
+
+      setDetectionResult({
+        primaryGuess: data.primaryGuess,
+        alternatives: data.alternatives,
+      });
+
+    } catch (err: any) {
+      setIsDetecting(false);
+      setErrorMsg(err.message || 'Failed to connect to the backend detection service.');
+    }
+  };
+
+  // Step 2: Proceed to full review with confirmed type
+  const handleProceedToReview = async (confirmedType: string) => {
+    setDetectionResult(null); // Close modal
+    
+    if (!editor) return;
+    const text = editor.getText();
+
     setIsLoading(true);
     setHasAnalyzed(true);
     setLoadingProgress(0);
-    setMobileTab('analysis'); // Switch tab on mobile so user sees loading state
 
-    // Simulate progress counting up to 99% while waiting for API
     const progressInterval = setInterval(() => {
       setLoadingProgress((prev) => {
         if (prev >= 99) return prev;
-        // Slow down as it gets closer to 99
         const increment = prev < 50 ? 5 : prev < 80 ? 2 : 1;
         return prev + increment;
       });
     }, 150);
 
     try {
-      const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
-      };
-
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
       if (geminiKey) headers['x-gemini-key'] = geminiKey.trim();
       if (openaiKey) headers['x-openai-key'] = openaiKey.trim();
       if (anthropicKey) headers['x-anthropic-key'] = anthropicKey.trim();
@@ -219,7 +288,7 @@ export default function Home() {
         body: JSON.stringify({
           essayText: text,
           targetModel: selectedModel,
-          documentType: gradingMode,
+          documentType: confirmedType,
         }),
       });
 
@@ -232,7 +301,6 @@ export default function Home() {
         throw new Error(data.message || 'An error occurred while analyzing the document.');
       }
 
-      // Small delay so user sees 100%
       setTimeout(() => {
         setReviewResult(data);
         setIsLoading(false);
@@ -286,25 +354,27 @@ export default function Home() {
           <AnalysisPage
             editor={editor}
             charCount={charCount}
-            gradingMode={gradingMode}
-            setGradingMode={setGradingMode}
             selectedModel={selectedModel}
             setSelectedModel={setSelectedModel}
             reviewResult={reviewResult}
             isLoading={isLoading}
+            isDetecting={isDetecting}
+            isUploading={isUploading}
             loadingProgress={loadingProgress}
             hasAnalyzed={hasAnalyzed}
             errorMsg={errorMsg}
-            handleReview={handleReview}
+            handleAnalyzeClick={handleAnalyzeClick}
             handleSaveDraft={handleSaveDraft}
+            handleFileUpload={handleFileUpload}
             mobileTab={mobileTab}
             setMobileTab={setMobileTab}
+            geminiKey={geminiKey}
+            openaiKey={openaiKey}
+            anthropicKey={anthropicKey}
           />
         )}
-
       </div>
 
-      {/* Settings configuration modal */}
       {isSettingsOpen && (
         <SettingsModal
           geminiKey={geminiKey}
@@ -315,6 +385,19 @@ export default function Home() {
           setAnthropicKey={setAnthropicKey}
           onClose={() => setIsSettingsOpen(false)}
           onSave={saveKeys}
+        />
+      )}
+
+      {detectionResult && (
+        <DetectionModal
+          primaryGuess={detectionResult.primaryGuess}
+          alternatives={detectionResult.alternatives}
+          onConfirm={handleProceedToReview}
+          onCancel={() => {
+            setDetectionResult(null);
+            setIsDetecting(false);
+            setHasAnalyzed(false);
+          }}
         />
       )}
     </div>

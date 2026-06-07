@@ -6,7 +6,7 @@ export interface Draft {
   title: string;
   date: string;
   text: string;
-  gradingMode: string;
+  gradingMode?: string;
 }
 
 interface DraftsPageProps {
@@ -51,9 +51,11 @@ export default function DraftsPage({ drafts, onLoadDraft, onDeleteDraft }: Draft
             >
               <div>
                 <div className="flex justify-between items-center mb-3">
-                  <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded uppercase tracking-wider font-mono">
-                    {draft.gradingMode.replace('_', ' ')}
-                  </span>
+                  {draft.gradingMode && (
+                    <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded uppercase tracking-wider font-mono">
+                      {draft.gradingMode.replace('_', ' ')}
+                    </span>
+                  )}
                   <div className="flex items-center gap-1 text-gray-400 text-xs font-mono font-medium">
                     <Clock className="h-3.5 w-3.5" />
                     {new Date(draft.date).toLocaleDateString()}
