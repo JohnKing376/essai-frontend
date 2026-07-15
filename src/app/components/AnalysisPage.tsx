@@ -56,12 +56,8 @@ export default function AnalysisPage({
   handleFileUpload,
   mobileTab,
   setMobileTab,
-  geminiKey,
-  openaiKey,
-  anthropicKey
 }: AnalysisPageProps) {
-  
-  // Array of loading messages to rotate through
+
   const loadingMessages = [
     "Analyzing document structure...",
     "Evaluating academic tone...",
@@ -83,19 +79,19 @@ export default function AnalysisPage({
   }, [isLoading, loadingMessages.length]);
 
   return (
-    <main className="p-4 md:p-8 max-w-[1400px] w-full mx-auto pb-24 md:pb-8">
-      
-      {/* Mobile Tab Switcher (Visible only on small screens after analysis) */}
+    <main className="p-4 md:p-8 w-full pb-24 md:pb-8 flex-1 overflow-hidden flex flex-col">
+
+      {/* Mobile Tab Switcher */}
       {hasAnalyzed && (
-        <div className="lg:hidden flex bg-white rounded-xl p-1 mb-6 shadow-sm border border-gray-200 sticky top-4 z-10">
-          <button 
-            className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${mobileTab === 'editor' ? 'bg-[#0f172a] text-white shadow-md' : 'text-gray-500 hover:text-gray-900'}`}
+        <div className="lg:hidden flex bg-[#0E0E11] rounded-xl p-1 mb-6 border border-white/8 sticky top-4 z-10">
+          <button
+            className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${mobileTab === 'editor' ? 'bg-[#F2543D] text-white' : 'text-[#93939B] hover:text-[#F3F3F5]'}`}
             onClick={() => setMobileTab('editor')}
           >
             Document Editor
           </button>
-          <button 
-            className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${mobileTab === 'analysis' ? 'bg-[#0f172a] text-white shadow-md' : 'text-gray-500 hover:text-gray-900'}`}
+          <button
+            className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${mobileTab === 'analysis' ? 'bg-[#F2543D] text-white' : 'text-[#93939B] hover:text-[#F3F3F5]'}`}
             onClick={() => setMobileTab('analysis')}
           >
             Analysis Results
@@ -103,26 +99,26 @@ export default function AnalysisPage({
         </div>
       )}
 
-      <div className={`grid grid-cols-1 ${hasAnalyzed ? 'lg:grid-cols-2' : ''} gap-8 items-start animate-fade-in`}>
+      <div className={`grid grid-cols-1 ${hasAnalyzed ? 'lg:grid-cols-2' : ''} gap-8 anim-fade-in flex-1 min-h-0 overflow-hidden`}>
 
         {/* Left Column: TipTap Document Workspace */}
-        <section className={`bg-white border border-[#e2e8f0] rounded-xl shadow-sm overflow-hidden ${!hasAnalyzed ? 'max-w-4xl mx-auto w-full' : ''} ${hasAnalyzed && mobileTab !== 'editor' ? 'hidden lg:block' : ''}`}>
+        <section className={`bg-[#0E0E11] border border-white/8 rounded-xl overflow-hidden shadow-[0_20px_60px_-20px_rgba(0,0,0,0.6)] h-full flex flex-col ${!hasAnalyzed ? 'max-w-4xl mx-auto w-full' : ''} ${hasAnalyzed && mobileTab !== 'editor' ? 'hidden lg:block lg:flex' : ''}`}>
+
           {/* Document Editor Header */}
-          <div className="border-b border-[#e2e8f0] px-4 md:px-6 py-4 bg-gray-50/50 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+          <div className="border-b border-white/8 px-4 md:px-6 py-4 bg-[#0E0E11] flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
             <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full sm:w-auto">
               <div className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-indigo-500" />
-                <h3 className="font-bold text-sm text-[#0f172a] tracking-wide uppercase">
+                <FileText className="h-5 w-5 text-[#FF7A60]" />
+                <h3 className="font-mono text-xs text-[#93939B] tracking-[0.1em] uppercase">
                   Editor
                 </h3>
               </div>
 
-              {/* Upload Document Button */}
-              <div className="flex items-center sm:ml-4 sm:border-l border-gray-200 sm:pl-4">
+              <div className="flex items-center sm:ml-4 sm:border-l border-white/8 sm:pl-4">
                 <label className={`flex items-center gap-2 px-3 py-1.5 text-xs font-bold rounded-lg cursor-pointer transition-colors ${
-                  isUploading 
-                    ? 'bg-indigo-100 text-indigo-400 cursor-not-allowed' 
-                    : 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100 hover:text-indigo-700'
+                  isUploading
+                    ? 'bg-[#F2543D]/10 text-[#F2543D]/50 cursor-not-allowed'
+                    : 'bg-[#F2543D]/10 text-[#FF7A60] hover:bg-[#F2543D]/20'
                 }`}>
                   {isUploading ? (
                     <RefreshCw className="h-4 w-4 animate-spin" />
@@ -130,27 +126,25 @@ export default function AnalysisPage({
                     <UploadCloud className="h-4 w-4" />
                   )}
                   {isUploading ? 'Uploading...' : 'Upload Doc'}
-                  <input 
-                    type="file" 
-                    accept=".pdf,.docx" 
+                  <input
+                    type="file"
+                    accept=".pdf,.docx"
                     onChange={handleFileUpload}
                     disabled={isUploading}
-                    className="hidden" 
+                    className="hidden"
                   />
                 </label>
               </div>
-
-              {/* Removed manual Document Type Selector for V2 Detection */}
             </div>
 
-            {/* Text editor format toolbars */}
+            {/* Format toolbar */}
             {editor && (
               <div className="flex gap-1 items-center self-end sm:self-auto">
                 <button
                   type="button"
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => editor.chain().focus().toggleBold().run()}
-                  className={`editor-toolbar-btn ${editor.isActive('bold') ? 'active' : ''}`}
+                  className={`p-2 rounded-md transition-colors active:scale-95 ${editor.isActive('bold') ? 'bg-[#F2543D]/15 text-[#FF7A60]' : 'text-[#93939B] hover:bg-[#18181C] hover:text-[#F3F3F5]'}`}
                   title="Bold"
                 >
                   <BoldIcon className="h-4 w-4" />
@@ -159,7 +153,7 @@ export default function AnalysisPage({
                   type="button"
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => editor.chain().focus().toggleItalic().run()}
-                  className={`editor-toolbar-btn ${editor.isActive('italic') ? 'active' : ''}`}
+                  className={`p-2 rounded-md transition-colors active:scale-95 ${editor.isActive('italic') ? 'bg-[#F2543D]/15 text-[#FF7A60]' : 'text-[#93939B] hover:bg-[#18181C] hover:text-[#F3F3F5]'}`}
                   title="Italic"
                 >
                   <ItalicIcon className="h-4 w-4" />
@@ -168,7 +162,7 @@ export default function AnalysisPage({
                   type="button"
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => editor.chain().focus().toggleBulletList().run()}
-                  className={`editor-toolbar-btn ${editor.isActive('bulletList') ? 'active' : ''}`}
+                  className={`p-2 rounded-md transition-colors active:scale-95 ${editor.isActive('bulletList') ? 'bg-[#F2543D]/15 text-[#FF7A60]' : 'text-[#93939B] hover:bg-[#18181C] hover:text-[#F3F3F5]'}`}
                   title="Bullet List"
                 >
                   <ListIcon className="h-4 w-4" />
@@ -178,23 +172,25 @@ export default function AnalysisPage({
           </div>
 
           {/* Editor Workspace */}
-          <div className="bg-white border-b border-[#e2e8f0]">
+          <div className="bg-[#0E0E11] border-b border-white/8 flex-1 overflow-y-auto min-h-0 cursor-text [&_.tiptap]:text-[#F3F3F5] [&_.tiptap]:bg-transparent [&_.tiptap]:min-h-full [&_.tiptap]:p-6"
+            onClick={() => editor?.commands.focus()}
+          >
             {editor && <EditorContent editor={editor} />}
           </div>
 
           {/* Editor Footer */}
-          <div className="px-4 md:px-6 py-5 bg-gray-50/50 flex flex-col sm:flex-row gap-4 items-center justify-between">
+          <div className="px-4 md:px-6 py-5 bg-[#0E0E11] flex flex-col sm:flex-row gap-4 items-center justify-between">
             <div className="flex flex-wrap items-center gap-4 justify-center sm:justify-start w-full sm:w-auto">
-              <span className="text-xs text-gray-400 font-mono">
+              <span className="text-xs text-[#5C5C64] font-mono">
                 {charCount} chars
               </span>
-              
+
               {!hasAnalyzed && (
                 <div className="flex items-center gap-2">
                   <select
                     value={selectedModel}
                     onChange={(e) => setSelectedModel(e.target.value as any)}
-                    className="text-xs font-semibold bg-white border border-[#e2e8f0] text-gray-600 rounded px-2.5 py-1 focus:outline-none focus:border-indigo-500 cursor-pointer"
+                    className="text-xs font-semibold bg-[#18181C] border border-white/8 text-[#93939B] rounded px-2.5 py-1.5 focus:outline-none focus:border-[#F2543D] cursor-pointer"
                   >
                     <option value="gemini">Gemini 3 Flash</option>
                     <option value="openai">GPT 5.5</option>
@@ -208,7 +204,7 @@ export default function AnalysisPage({
               <button
                 onClick={handleSaveDraft}
                 disabled={charCount === 0}
-                className="flex-1 sm:flex-none px-4 py-3 bg-white border border-gray-300 hover:border-[#0f172a] hover:text-[#0f172a] text-gray-600 disabled:text-gray-300 disabled:border-gray-200 rounded-lg font-bold text-sm tracking-wide transition flex items-center justify-center gap-2 shadow-sm"
+                className="flex-1 sm:flex-none px-4 py-3 bg-[#18181C] border border-white/8 hover:border-white/16 hover:text-[#F3F3F5] active:scale-95 text-[#93939B] disabled:text-[#5C5C64] disabled:border-white/4 disabled:active:scale-100 rounded-lg font-bold text-sm tracking-wide transition-all flex items-center justify-center gap-2"
               >
                 <Save className="h-4 w-4" />
                 <span className="hidden sm:inline">Save Draft</span>
@@ -216,7 +212,7 @@ export default function AnalysisPage({
               <button
                 onClick={handleAnalyzeClick}
                 disabled={isLoading || isDetecting || charCount < 100}
-                className="flex-1 sm:flex-none px-6 py-3 bg-[#0f172a] hover:bg-[#1e293b] disabled:bg-gray-200 disabled:text-gray-400 text-white rounded-lg font-bold text-sm tracking-wide transition uppercase flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
+                className="flex-1 sm:flex-none px-6 py-3 bg-gradient-to-b from-[#FF7A60] to-[#F2543D] hover:brightness-110 active:scale-95 disabled:bg-none disabled:bg-[#18181C] disabled:text-[#5C5C64] disabled:active:scale-100 text-white rounded-lg font-bold text-sm tracking-wide transition-all uppercase flex items-center justify-center gap-2 shadow-[0_8px_24px_-8px_rgba(242,84,61,0.55)] disabled:shadow-none"
               >
                 {isLoading ? (
                   <>
@@ -239,24 +235,23 @@ export default function AnalysisPage({
           </div>
         </section>
 
-        {/* Right Column: Dashboards Reports (Only visible if analyzed) */}
+        {/* Right Column: Analysis Results */}
         {hasAnalyzed && (
-          <section className={`flex flex-col gap-6 animate-fade-in ${mobileTab !== 'analysis' ? 'hidden lg:flex' : ''}`}>
-
-            {/* Header & Model Controls */}
+          <section className={`flex flex-col gap-6 anim-fade-in overflow-y-auto h-full pb-6 min-h-0 ${mobileTab !== 'analysis' ? 'hidden lg:flex' : ''}`}>
+ 
             <div className="flex items-center justify-between mb-2">
               <div>
-                <h2 className="text-2xl font-black text-[#0f172a]">Analysis Results</h2>
+                <h2 className="text-2xl font-black text-[#F3F3F5]">Analysis Results</h2>
               </div>
-              
+
               <div className="flex gap-1.5 sm:gap-2">
                 {['gemini', 'openai', 'anthropic'].map((model) => (
                   <button
                     key={model}
                     onClick={() => setSelectedModel(model as any)}
-                    className={`px-2 sm:px-3 py-1.5 border rounded-lg text-[10px] uppercase tracking-wider font-bold transition ${selectedModel === model
-                        ? 'border-[#0f172a] bg-indigo-50/50 text-[#0f172a]'
-                        : 'border-[#e2e8f0] text-gray-400 hover:bg-gray-50'
+                    className={`px-2 sm:px-3 py-1.5 border rounded-lg text-[10px] uppercase tracking-wider font-bold transition-all active:scale-95 ${selectedModel === model
+                        ? 'border-[#F2543D]/40 bg-[#F2543D]/10 text-[#FF7A60]'
+                        : 'border-white/8 text-[#5C5C64] hover:bg-[#18181C] hover:text-[#93939B]'
                       }`}
                   >
                     {model === 'gemini' ? 'Gemini' : model === 'openai' ? 'GPT 5.5' : 'Opus'}
@@ -266,7 +261,7 @@ export default function AnalysisPage({
             </div>
 
             {errorMsg && (
-              <div className="p-4 bg-rose-50 border border-rose-100 rounded-xl text-rose-600 flex gap-3 text-sm leading-relaxed">
+              <div className="p-4 bg-[#F2543D]/8 border border-[#F2543D]/25 rounded-xl text-[#FF7A60] flex gap-3 text-sm leading-relaxed">
                 <AlertTriangle className="h-5 w-5 shrink-0 mt-0.5" />
                 <div>
                   <span className="font-bold block mb-1">Evaluation Rejected</span>
@@ -275,96 +270,93 @@ export default function AnalysisPage({
               </div>
             )}
 
-            {/* NEW PROGRESS LOADING STATE */}
+            {/* LOADING STATE */}
             {isLoading && (
-              <div className="bg-white border border-[#e2e8f0] rounded-xl p-8 sm:p-16 text-center shadow-sm flex flex-col items-center justify-center min-h-[400px] sm:min-h-[500px]">
-                
+              <div className="bg-[#0E0E11] border border-white/8 rounded-xl p-8 sm:p-16 text-center flex flex-col items-center justify-center min-h-[400px] sm:min-h-[500px]">
+
                 <div className="relative flex items-center justify-center w-32 h-32 mb-8">
-                  {/* Outer animated ring */}
                   <svg className="absolute inset-0 w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                     <circle
                       cx="50" cy="50" r="46"
-                      className="stroke-gray-100 fill-none"
+                      className="stroke-white/8 fill-none"
                       strokeWidth="8"
                     />
                     <circle
                       cx="50" cy="50" r="46"
-                      className="stroke-[#0f172a] fill-none transition-all duration-300 ease-out"
+                      className="stroke-[#F2543D] fill-none transition-all duration-300 ease-out"
                       strokeWidth="8"
                       strokeLinecap="round"
                       strokeDasharray="289"
                       strokeDashoffset={289 - (289 * loadingProgress) / 100}
                     />
                   </svg>
-                  {/* Inner text */}
                   <div className="absolute flex flex-col items-center justify-center">
-                    <span className="text-3xl font-black text-[#0f172a]">{loadingProgress}%</span>
+                    <span className="text-3xl font-black text-[#F3F3F5]">{loadingProgress}%</span>
                   </div>
                 </div>
-                
-                <h4 className="font-bold text-[#0f172a] text-lg mb-2">Analyzing Document</h4>
-                <p className="text-sm text-gray-500 max-w-sm leading-relaxed h-6 transition-all">
+
+                <h4 className="font-bold text-[#F3F3F5] text-lg mb-2">Analyzing Document</h4>
+                <p className="text-sm text-[#93939B] max-w-sm leading-relaxed h-6 transition-all font-mono">
                   {loadingMessages[loadingMsgIdx]}
                 </p>
               </div>
             )}
 
-            {/* Report display dashboard panels */}
+            {/* Report display */}
             {reviewResult && !isLoading && (
-              <div className="flex flex-col gap-6 animate-fade-in">
+              <div className="flex flex-col gap-6 anim-fade-in">
 
-                {/* OVERALL ASSESSMENT CARD */}
-                <div className="bg-white border border-[#e2e8f0] rounded-xl p-6 md:p-8 shadow-sm flex items-center justify-between">
+                {/* OVERALL ASSESSMENT */}
+                <div className="bg-[#0E0E11] border border-white/8 rounded-xl p-6 md:p-8 flex items-center justify-between">
                   <div>
-                    <h4 className="text-xl font-black text-[#0f172a] mb-1">Overall Assessment</h4>
-                    <p className="text-sm text-gray-500 leading-relaxed">
+                    <h4 className="text-xl font-black text-[#F3F3F5] mb-1">Overall Assessment</h4>
+                    <p className="text-sm text-[#93939B] leading-relaxed">
                       Tailored specifically for the detected document type formatting.
                     </p>
                   </div>
-                  {/* Overall Score Box */}
-                  <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-[#0f172a] text-white flex items-center justify-center text-2xl md:text-3xl font-black shadow-lg">
+                  <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-b from-[#FF7A60] to-[#F2543D] text-white flex items-center justify-center text-2xl md:text-3xl font-black shadow-[0_8px_24px_-8px_rgba(242,84,61,0.55)]">
                     {reviewResult.overallScore.toFixed(1)}
                   </div>
                 </div>
 
-                {/* SUMMARY REVIEW CARD (Stacked full-width bands) */}
-                <div className="bg-white border border-[#e2e8f0] rounded-xl p-6 md:p-8 shadow-sm flex flex-col gap-8">
+                {/* SUMMARY REVIEW */}
+                <div className="bg-[#0E0E11] border border-white/8 rounded-xl p-6 md:p-8 flex flex-col gap-8">
                   <div>
-                    <span className="text-xs font-bold text-gray-400 uppercase tracking-widest block mb-3 font-mono">
+                    <span className="text-xs font-bold text-[#5C5C64] uppercase tracking-widest block mb-3 font-mono">
                       High-Level Summary
                     </span>
-                    <p className="text-base lg:text-lg text-[#334155] leading-relaxed font-serif">
+                    <p className="text-base lg:text-lg text-[#D4D4D8] leading-relaxed">
                       {reviewResult.feedbackSummary}
                     </p>
                   </div>
 
-                  <div className="flex flex-col gap-4 pt-6 border-t border-gray-100">
-                    {/* Notable strengths (Full width band) */}
-                    <div className="bg-emerald-50/50 p-5 md:p-6 rounded-xl border border-emerald-100">
-                      <span className="text-xs font-bold text-emerald-800 uppercase tracking-widest block mb-4 font-mono flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                  <div className="flex flex-col gap-4 pt-6 border-t border-white/8">
+                    {/* Strengths */}
+                    <div className="bg-[#7FE0B0]/[0.06] p-5 md:p-6 rounded-xl border border-[#7FE0B0]/20">
+                      <span className="text-xs font-bold text-[#7FE0B0] uppercase tracking-widest block mb-4 font-mono flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-[#7FE0B0]"></span>
                         Notable Strengths
                       </span>
                       <ul className="space-y-3">
                         {reviewResult.strengths.map((str, idx) => (
-                          <li key={idx} className="text-base text-emerald-950 leading-relaxed flex gap-3 items-start font-serif">
-                            <span className="text-emerald-500 font-bold mt-1">✓</span>
+                          <li key={idx} className="text-base text-[#D4D4D8] leading-relaxed flex gap-3 items-start">
+                            <span className="text-[#7FE0B0] font-bold mt-1">✓</span>
                             {str}
                           </li>
                         ))}
                       </ul>
                     </div>
 
-                    {/* Key suggestions (Full width band) */}
-                    <div className="bg-rose-50/50 p-5 md:p-6 rounded-xl border border-rose-100">
-                      <span className="text-xs font-bold text-rose-800 uppercase tracking-widest block mb-4 font-mono flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-rose-500"></span>
+                    {/* Suggestions */}
+                    <div className="bg-[#F2543D]/[0.06] p-5 md:p-6 rounded-xl border border-[#F2543D]/20">
+                      <span className="text-xs font-bold text-[#FF7A60] uppercase tracking-widest block mb-4 font-mono flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-[#F2543D]"></span>
                         Key Suggestions
                       </span>
                       <ul className="space-y-3">
                         {reviewResult.suggestions.map((sug, idx) => (
-                          <li key={idx} className="text-base text-rose-950 leading-relaxed flex gap-3 items-start font-serif">
-                            <span className="text-rose-500 font-bold mt-1">→</span>
+                          <li key={idx} className="text-base text-[#D4D4D8] leading-relaxed flex gap-3 items-start">
+                            <span className="text-[#FF7A60] font-bold mt-1">→</span>
                             {sug}
                           </li>
                         ))}
@@ -373,9 +365,9 @@ export default function AnalysisPage({
                   </div>
                 </div>
 
-                {/* DETAILED METRICS CARDS (RICH RENDER) */}
+                {/* DETAILED METRICS */}
                 <div className="grid grid-cols-1 gap-4 md:gap-6">
-                  <span className="text-xs font-bold text-gray-400 uppercase tracking-widest block mt-4 font-mono">
+                  <span className="text-xs font-bold text-[#5C5C64] uppercase tracking-widest block mt-4 font-mono">
                     Detailed Section Evaluations
                   </span>
 
@@ -393,58 +385,58 @@ export default function AnalysisPage({
   );
 }
 
-// Sub-component for rendering the rich category feedback
+// Sub-component for rich category feedback
 function CategoryCard({ title, data }: { title: string, data: any }) {
   const [expanded, setExpanded] = useState(false);
-  
+
   if (typeof data !== 'object' || !data.currentAssessment) {
     return null;
   }
 
   return (
-    <div className="bg-white border border-[#e2e8f0] rounded-xl overflow-hidden shadow-sm transition-all hover:border-[#cbd5e1]">
-      <div 
-        className="p-4 md:p-6 cursor-pointer flex items-center justify-between bg-gray-50/30"
+    <div className="bg-[#0E0E11] border border-white/8 rounded-xl overflow-hidden transition-all hover:border-white/16">
+      <div
+        className="p-4 md:p-6 cursor-pointer flex items-center justify-between active:scale-[0.99] transition-transform"
         onClick={() => setExpanded(!expanded)}
       >
         <div className="flex items-center gap-3 md:gap-4">
-          <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#f8fafc] border border-gray-200 flex items-center justify-center font-black text-[#0f172a] text-sm md:text-base">
+          <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#18181C] border border-white/8 flex items-center justify-center font-black text-[#F3F3F5] text-sm md:text-base">
             {data.score.toFixed(1)}
           </div>
-          <h4 className="font-bold text-base md:text-lg text-[#0f172a]">{title}</h4>
+          <h4 className="font-bold text-base md:text-lg text-[#F3F3F5]">{title}</h4>
         </div>
-        
+
         <div className="flex items-center gap-4">
-          <div className="hidden sm:block w-24 md:w-32 h-2 bg-gray-100 rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-indigo-500 rounded-full" 
+          <div className="hidden sm:block w-24 md:w-32 h-2 bg-[#18181C] rounded-full overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-[#FF7A60] to-[#F2543D] rounded-full transition-all duration-500"
               style={{ width: `${data.score * 10}%` }}
             ></div>
           </div>
-          {expanded ? <ChevronUp className="h-5 w-5 text-gray-400" /> : <ChevronDown className="h-5 w-5 text-gray-400" />}
+          {expanded ? <ChevronUp className="h-5 w-5 text-[#5C5C64]" /> : <ChevronDown className="h-5 w-5 text-[#5C5C64]" />}
         </div>
       </div>
 
       {expanded && (
-        <div className="p-4 md:p-6 pt-2 border-t border-gray-100 bg-white animate-fade-in">
+        <div className="p-4 md:p-6 pt-2 border-t border-white/8 bg-[#0E0E11] anim-fade-in">
           <div className="mb-6">
-            <span className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest block mb-2 font-mono">
+            <span className="text-[10px] font-bold text-[#FF7A60] uppercase tracking-widest block mb-2 font-mono">
               Current Assessment
             </span>
-            <p className="text-base text-gray-800 leading-relaxed font-serif">
+            <p className="text-base text-[#D4D4D8] leading-relaxed">
               {data.currentAssessment}
             </p>
           </div>
-          
+
           {data.actionableSuggestions && data.actionableSuggestions.length > 0 && (
             <div>
-              <span className="text-[10px] font-bold text-amber-600 uppercase tracking-widest block mb-3 font-mono">
+              <span className="text-[10px] font-bold text-amber-400 uppercase tracking-widest block mb-3 font-mono">
                 Actionable Suggestions
               </span>
               <ul className="space-y-2">
                 {data.actionableSuggestions.map((sug: string, idx: number) => (
-                  <li key={idx} className="text-sm md:text-base text-gray-700 leading-relaxed flex gap-3 items-start font-serif">
-                    <span className="text-amber-500 mt-1">•</span>
+                  <li key={idx} className="text-sm md:text-base text-[#D4D4D8] leading-relaxed flex gap-3 items-start">
+                    <span className="text-amber-400 mt-1">•</span>
                     {sug}
                   </li>
                 ))}

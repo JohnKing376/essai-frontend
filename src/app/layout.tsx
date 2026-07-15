@@ -1,36 +1,19 @@
-import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Lora } from 'next/font/google';
-import "./globals.css";
-
-const jakarta = Plus_Jakarta_Sans({
-  variable: '--font-jakarta',
-  subsets: ['latin'],
-});
-
-const lora = Lora({
-  variable: '--font-lora',
-  subsets: ['latin'],
-});
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: "Essai - Stateless AI Essay Reviewer",
-  description: "A completely stateless, privacy-first academic writing assistant. Analyze grammar, style, and structure instantly with Gemini, GPT, and Claude. Zero logs, zero database storage.",
+  title: 'EssaiAI — Academic Engine',
+  description: 'A stateless, privacy-first academic writing assistant.',
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${jakarta.variable} ${lora.variable} antialiased bg-[#f4f6fc]`}>
-        <div className="mesh-background">
-          <div className="mesh-glow-1"></div>
-          <div className="mesh-glow-2"></div>
-        </div>
-        {children}
-      </body>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+      </head>
+      <body>{children}</body>
     </html>
   );
 }
