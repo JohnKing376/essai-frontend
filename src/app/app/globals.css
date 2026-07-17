@@ -1,5 +1,54 @@
 @import "tailwindcss";
 
+:root {
+  --bg: #08080A;
+  --panel: #0E0E11;
+  --panel-2: #131316;
+  --card: #18181C;
+  --border: rgba(255,255,255,0.08);
+  --border-strong: rgba(255,255,255,0.16);
+  --text: #F3F3F5;
+  --dim: #93939B;
+  --faint: #5C5C64;
+  --accent: #F2543D;
+  --accent-2: #FF7A60;
+  --accent-soft: rgba(242,84,61,0.14);
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+.font-mono-label {
+  font-family: 'IBM Plex Mono', monospace;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Load-in animations */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.anim-fade-up    { animation: fadeUp 0.4s ease forwards; }
+.anim-fade-in    { animation: fadeIn 0.3s ease forwards; }
+.anim-slide-left { animation: slideInLeft 0.35s ease forwards; }
+
+/* Staggered children */
+.anim-fade-up:nth-child(1) { animation-delay: 0ms; }
+.anim-fade-up:nth-child(2) { animation-delay: 60ms; }
+.anim-fade-up:nth-child(3) { animation-delay: 120ms; }
+.anim-fade-up:nth-child(4) { animation-delay: 180ms; }
+
 @theme {
   --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-lora), ui-serif, Georgia, serif;
@@ -61,6 +110,7 @@ h1, h2, h3, h4, h5, h6 {
 .sidebar-link.active {
   color: var(--primary-indigo);
   background-color: #f0f3ff;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
 .sidebar-link.active::after {

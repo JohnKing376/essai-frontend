@@ -1,6 +1,8 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
+
 import {
   Settings,
   BookOpen,
@@ -26,24 +28,32 @@ export default function Sidebar({
 }: SidebarProps) {
   return (
     <>
-      {/* Mobile Top Header (Hidden on desktop) */}
-      <div className="md:hidden bg-white border-b border-[#e2e8f0] px-5 py-4 flex items-center justify-between sticky top-0 z-40 shadow-sm w-full">
-        <h1 className="text-lg font-bold text-[#0f172a] tracking-tight">EssaiAI</h1>
-        <p className="text-[10px] text-gray-400 font-mono tracking-wider uppercase">V3.5 Engine</p>
+      {/* Mobile Top Header */}
+      <div className="md:hidden bg-[#0E0E11] border-b border-white/8 px-5 py-4 flex items-center justify-between sticky top-0 z-40 w-full">
+        <Link href="/">
+          <h1 className="text-lg font-bold text-[#F3F3F5] tracking-tight hover:opacity-70 transition-opacity cursor-pointer flex items-center gap-2">
+            <span className="w-[7px] h-[7px] rounded-full bg-[#F2543D] shadow-[0_0_12px_2px_rgba(242,84,61,0.3)] inline-block" />
+            EssaiAI
+          </h1>
+        </Link>
+        <p className="text-[10px] text-[#5C5C64] font-mono tracking-wider uppercase">V3.5 Engine</p>
       </div>
 
-      {/* Desktop Sidebar (Hidden on mobile) */}
-      <aside className="hidden md:flex w-64 bg-white border-r border-[#e2e8f0] flex-col justify-between shrink-0">
+      {/* Desktop Sidebar */}
+      <aside className="hidden md:flex w-64 bg-[#0E0E11] border-r border-white/8 flex-col justify-between shrink-0">
         <div>
           {/* Brand header */}
-          <div className="p-6 border-b border-[#e2e8f0]">
-            <h2 className="text-xl font-black text-[#0f172a] tracking-tight">
-              EssaiAI
-            </h2>
-            <p className="text-[10px] text-gray-400 font-mono tracking-wider mt-1 uppercase mb-3">
+          <div className="p-6 border-b border-white/8 anim-slide-left">
+            <Link href="/">
+              <h2 className="text-xl font-black text-[#F3F3F5] tracking-tight hover:opacity-70 transition-opacity cursor-pointer flex items-center gap-2">
+                <span className="w-[7px] h-[7px] rounded-full bg-[#F2543D] shadow-[0_0_12px_2px_rgba(242,84,61,0.3)] inline-block" />
+                EssaiAI
+              </h2>
+            </Link>
+            <p className="text-[10px] text-[#FF7A60] font-mono tracking-[0.1em] mt-2 uppercase mb-3">
               V3.5 Academic Engine
             </p>
-            <p className="text-xs text-gray-500 font-sans leading-relaxed">
+            <p className="text-xs text-[#93939B] font-sans leading-relaxed">
               A stateless, privacy-first academic writing assistant. Analyze grammar, style, and structure instantly.
             </p>
           </div>
@@ -52,7 +62,7 @@ export default function Sidebar({
           <div className="p-4">
             <button
               onClick={handleNewAnalysis}
-              className="w-full py-3 bg-[#0f172a] hover:bg-[#1e293b] text-white rounded-lg font-semibold text-sm transition flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+              className="w-full py-3 bg-gradient-to-b from-[#FF7A60] to-[#F2543D] hover:brightness-110 active:scale-95 text-white rounded-lg font-semibold text-sm transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer shadow-[0_8px_24px_-8px_rgba(242,84,61,0.55)]"
             >
               <Plus className="h-4 w-4" />
               New Analysis
@@ -60,50 +70,41 @@ export default function Sidebar({
           </div>
 
           {/* Navigation Links */}
-          <nav className="mt-2 flex flex-col gap-0.5">
-            <button
-              onClick={() => setActiveNav('home')}
-              className={`sidebar-link ${activeNav === 'home' ? 'active' : ''}`}
-            >
-              <HomeIcon className="h-4 w-4" />
-              Home
-            </button>
-            <button
-              onClick={() => setActiveNav('drafts')}
-              className={`sidebar-link ${activeNav === 'drafts' ? 'active' : ''}`}
-            >
-              <FileText className="h-4 w-4" />
-              Drafts
-            </button>
-            <button
-              onClick={() => setActiveNav('templates')}
-              className={`sidebar-link ${activeNav === 'templates' ? 'active' : ''}`}
-            >
-              <BookOpen className="h-4 w-4" />
-              Templates
-            </button>
-            <button
-              onClick={() => setActiveNav('reviewers')}
-              className={`sidebar-link ${activeNav === 'reviewers' ? 'active' : ''}`}
-            >
-              <Award className="h-4 w-4" />
-              Reviewers
-            </button>
+          <nav className="mt-2 flex flex-col gap-0.5 px-2">
+            {[
+              { key: 'home', label: 'Home', Icon: HomeIcon },
+              { key: 'drafts', label: 'Drafts', Icon: FileText },
+              { key: 'templates', label: 'Templates', Icon: BookOpen },
+              { key: 'reviewers', label: 'Reviewers', Icon: Award },
+            ].map(({ key, label, Icon }) => (
+              <button
+                key={key}
+                onClick={() => setActiveNav(key as any)}
+                className={`anim-fade-up active:scale-[0.97] transition-all duration-150 flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium ${
+                  activeNav === key
+                    ? 'bg-[#18181C] text-[#FF7A60] border border-white/8'
+                    : 'text-[#93939B] hover:bg-[#131316] hover:text-[#F3F3F5]'
+                }`}
+              >
+                <Icon className="h-4 w-4" />
+                {label}
+              </button>
+            ))}
           </nav>
         </div>
 
         {/* Footer anchors */}
-        <div className="p-4 border-t border-[#e2e8f0] flex flex-col gap-0.5">
+        <div className="p-4 border-t border-white/8 flex flex-col gap-0.5">
           <button
             onClick={() => setIsSettingsOpen(true)}
-            className="sidebar-link w-full py-2 hover:bg-gray-50 rounded-lg text-left"
+            className="active:scale-[0.97] transition-transform duration-150 w-full py-2.5 px-4 rounded-lg text-left flex items-center gap-3 text-sm text-[#93939B] hover:bg-[#131316] hover:text-[#F3F3F5]"
           >
             <Settings className="h-4 w-4" />
             Key Settings
           </button>
           <button
             onClick={() => alert('Feedback panel coming soon!')}
-            className="sidebar-link py-2 w-full text-left"
+            className="active:scale-[0.97] transition-transform duration-150 w-full py-2.5 px-4 rounded-lg text-left flex items-center gap-3 text-sm text-[#93939B] hover:bg-[#131316] hover:text-[#F3F3F5]"
           >
             <MessageSquare className="h-4 w-4" />
             Feedback
@@ -111,40 +112,40 @@ export default function Sidebar({
         </div>
       </aside>
 
-      {/* Mobile Floating Bottom Nav (Hidden on desktop) */}
+      {/* Mobile Floating Bottom Nav */}
       <div className="md:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-sm">
-        <div className="bg-white/90 backdrop-blur-lg border border-gray-200/50 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] p-2 flex items-center justify-between">
+        <div className="bg-[#0E0E11]/90 backdrop-blur-lg border border-white/8 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.5)] p-2 flex items-center justify-between">
           <button
             onClick={() => setActiveNav('home')}
-            className={`p-3 rounded-full flex flex-col items-center justify-center transition-all ${activeNav === 'home' ? 'bg-[#0f172a] text-white shadow-md' : 'text-gray-500 hover:bg-gray-100'}`}
+            className={`p-3 rounded-full flex flex-col items-center justify-center transition-all active:scale-95 ${activeNav === 'home' ? 'bg-[#F2543D] text-white' : 'text-[#93939B] hover:bg-[#131316]'}`}
           >
             <HomeIcon className="h-5 w-5" />
           </button>
-          
+
           <button
             onClick={() => setActiveNav('drafts')}
-            className={`p-3 rounded-full flex flex-col items-center justify-center transition-all ${activeNav === 'drafts' ? 'bg-[#0f172a] text-white shadow-md' : 'text-gray-500 hover:bg-gray-100'}`}
+            className={`p-3 rounded-full flex flex-col items-center justify-center transition-all active:scale-95 ${activeNav === 'drafts' ? 'bg-[#F2543D] text-white' : 'text-[#93939B] hover:bg-[#131316]'}`}
           >
             <FileText className="h-5 w-5" />
           </button>
-          
+
           <button
             onClick={handleNewAnalysis}
-            className="p-4 -mt-6 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full flex flex-col items-center justify-center shadow-lg transition-all border-4 border-[#f4f6fc]"
+            className="p-4 -mt-6 bg-gradient-to-b from-[#FF7A60] to-[#F2543D] text-white rounded-full flex flex-col items-center justify-center shadow-lg transition-all active:scale-90 border-4 border-[#08080A]"
           >
             <Plus className="h-6 w-6" />
           </button>
 
           <button
             onClick={() => setActiveNav('templates')}
-            className={`p-3 rounded-full flex flex-col items-center justify-center transition-all ${activeNav === 'templates' ? 'bg-[#0f172a] text-white shadow-md' : 'text-gray-500 hover:bg-gray-100'}`}
+            className={`p-3 rounded-full flex flex-col items-center justify-center transition-all active:scale-95 ${activeNav === 'templates' ? 'bg-[#F2543D] text-white' : 'text-[#93939B] hover:bg-[#131316]'}`}
           >
             <BookOpen className="h-5 w-5" />
           </button>
 
           <button
             onClick={() => setIsSettingsOpen(true)}
-            className="p-3 rounded-full flex flex-col items-center justify-center transition-all text-gray-500 hover:bg-gray-100"
+            className="p-3 rounded-full flex flex-col items-center justify-center transition-all active:scale-95 text-[#93939B] hover:bg-[#131316]"
           >
             <Settings className="h-5 w-5" />
           </button>
